@@ -1,0 +1,116 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: office@walt.id
+    name: walt.id
+    url: https://walt.id
+  description: The walt.id public API documentation
+  title: walt.id Auditor API
+  version: 1.1-SNAPSHOT
+externalDocs:
+  description: walt.id Docs
+  url: https://docs.walt.id
+servers:
+- url: https://auditor.ssikit.walt.id/
+paths:
+  /api-routes:
+    get:
+      operationId: getApiRoutes
+      responses:
+        "200":
+          description: Default response
+      summary: Get apiRoutes
+  /health:
+    get:
+      operationId: health
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Returns HTTP 200 in case all services are up and running
+  /v1/policies:
+    get:
+      operationId: listPolicies
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/VerificationPolicy'
+                type: array
+          description: OK
+      summary: List verification policies
+      tags:
+      - Verification Policies
+  /v1/verify:
+    post:
+      operationId: verifyVP
+      parameters:
+      - description: Optional comma-separated list for setting the policies to be
+          verified.
+        explode: true
+        in: query
+        name: policyList
+        required: false
+        schema:
+          type: string
+        style: form
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: VC or VP to be verified
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResult'
+          description: Request processed successfully (VP might not be valid)
+      summary: Verify a W3C VerifiableCredential or VerifiablePresentation
+      tags:
+      - Verification Policies
+components:
+  schemas:
+    VerificationPolicy:
+      example:
+        description: description
+        id: id
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+      required:
+      - description
+      - id
+      type: object
+    VerificationResult:
+      example:
+        policyResults:
+          key: true
+        overallStatus: true
+      properties:
+        overallStatus:
+          type: boolean
+        policyResults:
+          additionalProperties:
+            type: boolean
+          type: object
+      required:
+      - overallStatus
+      - policyResults
+      type: object
+  securitySchemes:
+    http:
+      bearerFormat: JWT
+      description: HTTP Bearer Token authentication
+      in: header
+      name: bearerAuth
+      scheme: bearer
+      type: http

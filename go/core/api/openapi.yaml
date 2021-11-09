@@ -1,0 +1,548 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: office@walt.id
+    name: walt.id
+    url: https://walt.id
+  description: The walt.id public API documentation
+  title: walt.id Core API
+  version: 1.1-SNAPSHOT
+externalDocs:
+  description: walt.id Docs
+  url: https://docs.walt.id
+servers:
+- url: https://core.ssikit.walt.id/
+paths:
+  /api-routes:
+    get:
+      operationId: getApiRoutes
+      responses:
+        "200":
+          description: Default response
+      summary: Get apiRoutes
+  /health:
+    get:
+      operationId: health
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Returns HTTP 200 in case all services are up and running
+  /v1/key:
+    get:
+      operationId: listKeys
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: The desired key IDs
+      summary: List of key IDs
+      tags:
+      - Key Management
+  /v1/key/{id}:
+    delete:
+      operationId: deleteKey
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: ID of key to be deleted
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Delete key
+      tags:
+      - Key Management
+    get:
+      operationId: getV1KeyWithId
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Load public key
+      tags:
+      - Key Management
+  /v1/key/gen:
+    post:
+      operationId: genKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenKeyRequest'
+        description: The desired key algorithm (ECDSA_Secp256k1 or EdDSA_Ed25519)
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyId'
+          description: Key ID
+      summary: Generate key
+      tags:
+      - Key Management
+  /v1/key/import:
+    post:
+      operationId: importKey
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: Imports the key (JWK format) to the key store
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Import key
+      tags:
+      - Key Management
+  /v1/key/export:
+    post:
+      operationId: exportKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportKeyRequest'
+        description: Exports the key in JWK or PEM format
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: The key in the desired formant
+      summary: Exports public and private key part (if supported by underlying keystore)
+      tags:
+      - Key Management
+  /v1/did:
+    get:
+      operationId: listDids
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: OK
+      summary: List DIDs
+      tags:
+      - Decentralized Identifiers
+  /v1/did/{id}:
+    delete:
+      operationId: deleteDid
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: ID of the DID to be deleted
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Delete DID
+      tags:
+      - Decentralized Identifiers
+    get:
+      operationId: loadDid
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: ID of the DID to be loaded
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Load DID
+      tags:
+      - Decentralized Identifiers
+  /v1/did/create:
+    post:
+      operationId: createDid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDidRequest'
+        description: Defines the DID method and optionally the key to be used
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: DID document of the resolved DID
+      summary: Create DID
+      tags:
+      - Decentralized Identifiers
+  /v1/did/resolve:
+    post:
+      operationId: resolveDid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveDidRequest'
+        description: Identifier to be resolved
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: DID document of the resolved DID
+      summary: Resolve DID
+      tags:
+      - Decentralized Identifiers
+  /v1/did/import:
+    post:
+      operationId: importDid
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: Imports the DID to the underlying data store
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Import DID
+      tags:
+      - Decentralized Identifiers
+  /v1/vc:
+    get:
+      operationId: listVcs
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: OK
+      summary: List VCs
+      tags:
+      - Verifiable Credentials
+  /v1/vc/{id}:
+    delete:
+      operationId: deleteVc
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: ID of VC to be deleted
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Delete VC
+      tags:
+      - Verifiable Credentials
+    get:
+      operationId: loadVc
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: ID of the DID to be loaded
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Load VC
+      tags:
+      - Verifiable Credentials
+  /v1/vc/create:
+    post:
+      operationId: createVc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVcRequest'
+        description: 'Defines the credential issuer, holder and optionally a credential
+          template  -  TODO: build credential based on the request e.g. load template,
+          substitute values'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: The signed credential
+      summary: Create VC
+      tags:
+      - Verifiable Credentials
+  /v1/vc/present:
+    post:
+      operationId: presentVc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentVcRequest'
+        description: Defines the VC to be presented
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: The signed presentation
+      summary: Present VC
+  /v1/vc/verify:
+    post:
+      operationId: verifyVc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyVcRequest'
+        description: VC to be verified
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyVcRequest'
+          description: Verification result object
+      summary: Verify VC
+      tags:
+      - Verifiable Credentials
+  /v1/vc/import:
+    post:
+      operationId: importVc
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Import VC
+      tags:
+      - Verifiable Credentials
+components:
+  schemas:
+    GenKeyRequest:
+      example:
+        keyAlgorithm: EdDSA_Ed25519
+      properties:
+        keyAlgorithm:
+          enum:
+          - EdDSA_Ed25519
+          - ECDSA_Secp256k1
+          type: string
+      required:
+      - keyAlgorithm
+      type: object
+    KeyId:
+      example:
+        id: id
+      properties:
+        id:
+          type: string
+      required:
+      - id
+      type: object
+    ExportKeyRequest:
+      example:
+        keyAlias: keyAlias
+        exportPrivate: true
+        format: JWK
+      properties:
+        keyAlias:
+          type: string
+        format:
+          enum:
+          - JWK
+          - PEM
+          type: string
+        exportPrivate:
+          type: boolean
+      required:
+      - exportPrivate
+      - format
+      - keyAlias
+      type: object
+    CreateDidRequest:
+      example:
+        method: key
+        keyAlias: keyAlias
+      properties:
+        method:
+          enum:
+          - key
+          - web
+          - ebsi
+          type: string
+        keyAlias:
+          type: string
+      required:
+      - method
+      type: object
+    ResolveDidRequest:
+      example:
+        did: did
+      properties:
+        did:
+          type: string
+      required:
+      - did
+      type: object
+    CreateVcRequest:
+      example:
+        issuerDid: issuerDid
+        domain: domain
+        templateId: templateId
+        subjectDid: subjectDid
+        nonce: nonce
+        credentialOffer: credentialOffer
+      properties:
+        issuerDid:
+          type: string
+        subjectDid:
+          type: string
+        credentialOffer:
+          type: string
+        templateId:
+          type: string
+        domain:
+          type: string
+        nonce:
+          type: string
+      required:
+      - issuerDid
+      type: object
+    PresentVcRequest:
+      example:
+        domain: domain
+        challenge: challenge
+        holderDid: holderDid
+        vc: vc
+      properties:
+        vc:
+          type: string
+        holderDid:
+          type: string
+        domain:
+          type: string
+        challenge:
+          type: string
+      required:
+      - holderDid
+      - vc
+      type: object
+    VerifyVcRequest:
+      example:
+        vcOrVp: vcOrVp
+      properties:
+        vcOrVp:
+          type: string
+      required:
+      - vcOrVp
+      type: object
+  securitySchemes:
+    http:
+      bearerFormat: JWT
+      description: HTTP Bearer Token authentication
+      in: header
+      name: bearerAuth
+      scheme: bearer
+      type: http

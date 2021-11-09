@@ -1,0 +1,611 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: office@walt.id
+    name: walt.id
+    url: https://walt.id
+  description: The walt.id public API documentation
+  title: walt.id ESSIF API
+  version: 1.1-SNAPSHOT
+externalDocs:
+  description: walt.id Docs
+  url: https://docs.walt.id/api
+servers:
+- url: https://essif.ssikit.walt.id/
+paths:
+  /api-routes:
+    get:
+      operationId: getApiRoutes
+      responses:
+        "200":
+          description: Default response
+      summary: Get apiRoutes
+  /health:
+    get:
+      operationId: health
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Returns HTTP 200 in case all services are up and running
+  /v1/trusted-issuer/generateAuthenticationRequest:
+    post:
+      operationId: generateAuthenticationRequest
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: DID Auth Request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error
+      summary: Generates a DID-SIOP Auth Request.
+      tags:
+      - Trusted Issuer
+  /v1/trusted-issuer/openSession:
+    post:
+      operationId: openSession
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Encrypted access token
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error
+      summary: Establishes a mutual authenticated DID-SIOP session.
+      tags:
+      - Trusted Issuer
+  /v1/client/onboard:
+    post:
+      operationId: onboard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EbsiOnboardRequest'
+        description: DID to be registered on the EBSI Blockchain; Bearer token to
+          be used to authenticate the user. Get it from here https://app.preprod.ebsi.eu/users-onboarding
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Onboarding flow completed successfully
+      summary: EBSI onboarding flow, which requests a Verifiable Authorization from
+        the EOS.
+      tags:
+      - ESSIF Client
+  /v1/client/auth:
+    post:
+      operationId: createDid
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: DID
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Auth flow executed successfully
+      summary: Runs the ESSIF Authorization API flow
+      tags:
+      - ESSIF Client
+  /v1/client/registerDid:
+    post:
+      operationId: registerDid
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: DID
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: DID registered successfully
+      summary: Registers DID on the EBSI Blockchain
+      tags:
+      - ESSIF Client
+  /test/user/wallet/createDid:
+    post:
+      operationId: createUserDid
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: Verifiable Authorization
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Created DID
+      summary: Creates and registers DID on the EBSI Blockchain
+      tags:
+      - ESSIF User Wallet
+  /test/user/wallet/requestAccessToken:
+    post:
+      operationId: requestAccessToken
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: The Verifiable Authorization
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: JWT Access Token
+      summary: Runs the authentication-protocol and returns the JWT Access Token for
+        accessing the protected EBSI services.
+      tags:
+      - ESSIF User Wallet
+  /test/user/wallet/validateDidAuthRequest:
+    post:
+      operationId: validateDidAuthRequest
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: DID Auth request
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: boolean
+          description: True, in case the request could be validated.
+      summary: Validates a DID Auth request.
+      tags:
+      - ESSIF User Wallet
+  /test/user/wallet/didAuthResponse:
+    post:
+      operationId: didAuthResponse
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: DID Auth Request
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: VC Token
+      summary: Generates and sends the DID Auth Response message.
+      tags:
+      - ESSIF User Wallet
+  /test/user/wallet/vcAuthResponse:
+    post:
+      operationId: vcAuthResponse
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: VC Exchange Request
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: VC token
+      summary: Generates a VC Auth Response message.
+      tags:
+      - ESSIF User Wallet
+  /test/user/wallet/oidcAuthResponse:
+    post:
+      operationId: oidcAuthResponse
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: todo
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OIDC Auth response
+      summary: Generates a OIDC Auth Response message.
+      tags:
+      - ESSIF User Wallet
+  /test/ti/credentials:
+    post:
+      operationId: getCredential
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: DID Auth Request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error
+      summary: Returns DID Auth Request or the requested credential if a VC Token
+        is presented
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/ti/credentials/{credentialId}:
+    get:
+      operationId: getCredential
+      parameters:
+      - explode: false
+        in: path
+        name: credentialId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: DID Auth Request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error
+      summary: Returns DID Auth Request or the requested credential if a VC Token
+        is presented
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/ti/requestCredentialUri:
+    get:
+      operationId: requestCredentialUri
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OIDC Authentication Request URI
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error
+      summary: Creates an OIDC authentication request URI.
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/ti/requestVerifiableCredential:
+    post:
+      operationId: requestVerifiableCredential
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: Credential request URI
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: DID ownership request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error
+      summary: Returns the DID ownership request
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/eos/onboard:
+    post:
+      operationId: onboards
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: DID to be registered
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Request DID ownership
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error
+      summary: Request Verifiable Authorization. Returns the DID ownership request.
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/eos/signedChallenge:
+    post:
+      operationId: signedChallenge
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: Signed challenge
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Verifiable Authorization
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error
+      summary: Processes the signed challenge in the scope of DID Auth and if successful,
+        returns the Verifiable Authorization
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/enterprise/wallet/createDid:
+    post:
+      operationId: createEnterpriseDid
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: Verifiable Authorization
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Created DID
+      summary: Creates and registers DID on the EBSI Blockchain
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/enterprise/wallet/requestVerifiableAuthorization:
+    post:
+      operationId: requestVerifiableAuthorization
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: Access Token
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Verifiable Authorization
+      summary: Performs DID Auth in order to obtain a Verifiable Authorization
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/enterprise/wallet/requestVerifiableCredential:
+    post:
+      operationId: requestEnterpriseVerifiableCredential
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: Credential Request URI
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: DID ownership response
+      summary: Request credential
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/enterprise/wallet/generateDidAuthRequest:
+    post:
+      operationId: generateDidAuthRequest
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: DID Auth Reqeust
+      summary: Generates a DID Auth Request
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/enterprise/wallet/validateDidAuthResponse:
+    post:
+      operationId: validateDidAuthResponse
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: DID Auth Response
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: boolean
+          description: True, if response could be validated
+      summary: Validates a DID Auth response
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/enterprise/wallet/getVerifiableCredential:
+    post:
+      operationId: getVerifiableCredential
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: DID ownership request
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Verifiable Credential
+      summary: Generates the DID ownership response and fetches the requested credential.
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/enterprise/wallet/token:
+    post:
+      operationId: token
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: oidcAuthResp
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: OIDC Token endpoint
+      tags:
+      - ESSIF Enterprise Wallet
+  /test/enterprise/wallet/authentication-requests:
+    post:
+      operationId: postTestEnterpriseWalletAuthenticationRequests
+      responses:
+        "200":
+          description: Default response
+      summary: Post test enterprise wallet authenticationRequests
+components:
+  schemas:
+    ErrorResponse:
+      properties:
+        title:
+          type: string
+        status:
+          format: int32
+          type: integer
+        type:
+          type: string
+        details:
+          items:
+            type: string
+          type: array
+      required:
+      - details
+      - status
+      - title
+      type: object
+    EbsiOnboardRequest:
+      example:
+        bearerToken: bearerToken
+        did: did
+      properties:
+        bearerToken:
+          type: string
+        did:
+          type: string
+      required:
+      - bearerToken
+      - did
+      type: object
+  securitySchemes:
+    http:
+      bearerFormat: JWT
+      description: HTTP Bearer Token authentication
+      in: header
+      name: bearerAuth
+      scheme: bearer
+      type: http

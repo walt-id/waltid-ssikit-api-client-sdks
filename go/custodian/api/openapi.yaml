@@ -1,0 +1,285 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: office@walt.id
+    name: walt.id
+    url: https://walt.id
+  description: The walt.id public API documentation
+  title: walt.id Custodian API
+  version: 1.1-SNAPSHOT
+externalDocs:
+  description: walt.id Docs
+  url: https://docs.walt.id/api
+servers:
+- url: https://custodian.ssikit.walt.id/
+paths:
+  /api-routes:
+    get:
+      operationId: getApiRoutes
+      responses:
+        "200":
+          description: Default response
+      summary: Get apiRoutes
+  /health:
+    get:
+      operationId: health
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Returns HTTP 200 in case all services are up and running
+  /keys:
+    get:
+      operationId: listKeys
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Array of keys
+      summary: Lists all keys the custodian knows of
+      tags:
+      - Keys
+  /keys/{alias}:
+    get:
+      operationId: getKey
+      parameters:
+      - explode: false
+        in: path
+        name: alias
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Key by alias
+      summary: Gets a key specified by its alias
+      tags:
+      - Keys
+  /keys/generate:
+    post:
+      operationId: generateKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateKeyRequest'
+        description: Generate Key Request
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Created key
+      summary: Generates a key with a specific key algorithm
+      tags:
+      - Keys
+  /keys/store:
+    put:
+      operationId: storeKey
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Http OK
+      summary: Stores a key
+      tags:
+      - Keys
+  /keys/{id}:
+    delete:
+      operationId: deleteKey
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Http OK
+      summary: Deletes a specific key
+      tags:
+      - Keys
+  /credentials:
+    get:
+      operationId: listCredentials
+      parameters:
+      - explode: true
+        in: query
+        name: id
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Credentials list
+      summary: Lists all credentials the custodian knows of
+      tags:
+      - Credentials
+  /credentials/{id}:
+    get:
+      operationId: getCredential
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Created Credential
+        "404":
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: Not Found
+      summary: Gets a specific Credential by id
+      tags:
+      - Credentials
+  /credentials/listCredentialIds:
+    get:
+      operationId: listCredentialIds
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Credentials ID list
+      summary: Lists all credential IDs the custodian knows of
+      tags:
+      - Credentials
+  /credentials/{alias}:
+    delete:
+      operationId: deleteCredential
+      parameters:
+      - explode: false
+        in: path
+        name: alias
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Http OK
+      summary: Deletes a specific credential by alias
+      tags:
+      - Credentials
+    put:
+      operationId: storeCredential
+      parameters:
+      - explode: false
+        in: path
+        name: alias
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreCredentialRequest'
+        description: Store Credential Request
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Http OK
+      summary: Stores a credential
+      tags:
+      - Credentials
+components:
+  schemas:
+    GenerateKeyRequest:
+      example:
+        keyAlgorithm: EdDSA_Ed25519
+      properties:
+        keyAlgorithm:
+          enum:
+          - EdDSA_Ed25519
+          - ECDSA_Secp256k1
+          type: string
+      required:
+      - keyAlgorithm
+      type: object
+    StoreCredentialRequest:
+      example:
+        alias: alias
+        vc:
+          jwt: jwt
+          json: json
+          id: id
+          type:
+          - type
+          - type
+      properties:
+        alias:
+          type: string
+        vc:
+          $ref: '#/components/schemas/VerifiableCredential'
+      required:
+      - alias
+      - vc
+      type: object
+    VerifiableCredential:
+      example:
+        jwt: jwt
+        json: json
+        id: id
+        type:
+        - type
+        - type
+      properties:
+        type:
+          items:
+            type: string
+          type: array
+        json:
+          type: string
+        jwt:
+          type: string
+        id:
+          type: string
+      required:
+      - type
+      type: object
